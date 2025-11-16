@@ -61,7 +61,7 @@ A high-accuracy Chrome extension for transcribing videos from Google Drive with 
      - `background.js`
      - `content.js`
      - `styles.css`
-     - `icons/` folder (create placeholder icons if needed)
+     - `icons/` folder with included icon files (icon16.png, icon48.png, icon128.png)
 
 2. **Open Chrome Extensions Page**
 
@@ -79,17 +79,15 @@ A high-accuracy Chrome extension for transcribing videos from Google Drive with 
    - Click the puzzle piece icon in the Chrome toolbar
    - Find "Video Transcriber Pro" and click the pin icon
 
-### Method 2: Create Icon Files (Optional)
+### Method 2: Custom Icon Files (Optional)
 
-If you want custom icons, create these files in the `icons/` folder:
+The extension comes with beautiful gradient microphone icons, but if you want to customize them, you can replace these files in the `icons/` folder:
 
-- `icon16.png` (16x16 pixels)
-- `icon48.png` (48x48 pixels)
-- `icon128.png` (128x128 pixels)
+- `icon16.png` (16x16 pixels) - Toolbar icon
+- `icon48.png` (48x48 pixels) - Extension management page
+- `icon128.png` (128x128 pixels) - Chrome Web Store and installation
 
-You can use any image editing software or online icon generators to create these.
-
-## How to Use
+You can use any image editing software or online icon generators to create these. The current icons feature a purple-to-blue gradient background with a white microphone symbol.## How to Use
 
 ### Method 1: Full Video Transcription (Recommended for most use cases)
 
