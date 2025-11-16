@@ -7,6 +7,7 @@ class TranscriptionPopup {
     this.attachEventListeners();
     this.loadSettings();
     this.updateUI();
+    this.validateUrl(); // Initialize URL button state
   }
 
   initializeElements() {
@@ -22,6 +23,9 @@ class TranscriptionPopup {
       preview: document.getElementById("transcription-preview"),
       language: document.getElementById("language-select"),
       continuousMode: document.getElementById("continuous-mode"),
+      videoUrlInput: document.getElementById("video-url-input"),
+      transcribeUrlBtn: document.getElementById("transcribe-url-btn"),
+      clearUrlBtn: document.getElementById("clear-url-btn"),
     };
   }
 
@@ -37,6 +41,16 @@ class TranscriptionPopup {
     );
     this.elements.downloadBtn.addEventListener("click", () =>
       this.downloadTranscript()
+    );
+
+    this.elements.transcribeUrlBtn.addEventListener("click", () =>
+      this.transcribeFromUrl()
+    );
+    this.elements.clearUrlBtn.addEventListener("click", () =>
+      this.clearUrl()
+    );
+    this.elements.videoUrlInput.addEventListener("input", () =>
+      this.validateUrl()
     );
 
     // Settings change listeners
@@ -251,7 +265,15 @@ class TranscriptionPopup {
     this.elements.stopBtn.disabled = !this.isTranscribing;
     this.elements.transcribeFullBtn.disabled = this.isTranscribing;
     this.elements.downloadBtn.disabled = !this.transcript;
-    this.elements.copyBtn.disabled = !this.transcript;
+    
+    // Update URL transcription button state
+    if (this.isTranscribing) {
+      this.elements.transcribeUrlBtn.disabled = true;
+      this.elements.transcribeUrlBtn.classList.add("btn-disabled");
+    } else {
+      // Re-validate URL when not transcribing
+      this.validateUrl();
+    }
 
     // Update button styling based on disabled state
     if (this.isTranscribing) {
@@ -270,17 +292,14 @@ class TranscriptionPopup {
         "w-full btn-secondary text-white px-4 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all";
     }
 
-    // Update download/copy buttons
+    // Update download button styling
     if (this.transcript) {
       this.elements.downloadBtn.className =
-        "flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all";
-      this.elements.copyBtn.className =
-        "flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 transition-all";
+        "btn-blue flex items-center justify-center gap-2";
     } else {
       this.elements.downloadBtn.className =
-        "flex-1 bg-slate-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-600 transition-all";
-      this.elements.copyBtn.className =
-        "flex-1 bg-slate-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-600 transition-all";
+        "btn-gray flex items-center justify-center gap-2";
+      this.elements.downloadBtn.classList.add("btn-disabled");
     }
   }
 
@@ -359,6 +378,137 @@ class TranscriptionPopup {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  }
+
+  validateUrl() {
+    const url = this.elements.videoUrlInput.value.trim();
+    const isValidGoogleDriveUrl = this.isValidGoogleDriveUrl(url);
+    const container = this.elements.videoUrlInput.parentElement.parentElement;
+    
+    // Enable/disable transcribe button based on URL validity
+    this.elements.transcribeUrlBtn.disabled = !isValidGoogleDriveUrl || this.isTranscribing;
+    
+    // Update visual feedback
+    container.classList.remove("url-input-container", "has-valid-url", "has-invalid-url");
+    container.classList.add("url-input-container");
+    
+    if (url) {
+      if (isValidGoogleDriveUrl) {
+        container.classList.add("has-valid-url");
+        this.elements.transcribeUrlBtn.classList.remove("btn-disabled");
+      } else {
+        container.classList.add("has-invalid-url");
+        this.elements.transcribeUrlBtn.classList.add("btn-disabled");
+      }
+    } else {
+      this.elements.transcribeUrlBtn.classList.add("btn-disabled");
+    }
+  }
+
+  isValidGoogleDriveUrl(url) {
+    const googleDrivePatterns = [
+      /^https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+/,
+      /^https:\/\/docs\.google\.com\/.*\/d\/[a-zA-Z0-9_-]+/,
+      /^https:\/\/drive\.google\.com\/open\?id=[a-zA-Z0-9_-]+/
+    ];
+    
+    return googleDrivePatterns.some(pattern => pattern.test(url));
+  }
+
+  async transcribeFromUrl() {
+    const url = this.elements.videoUrlInput.value.trim();
+    
+    if (!this.isValidGoogleDriveUrl(url)) {
+      this.updateStatus("Please enter a valid Google Drive video URL", "error");
+      return;
+    }
+
+    try {
+      this.updateStatus("Opening video...", "transcribing");
+      
+      // Extract file ID from the URL
+      const fileId = this.extractFileIdFromUrl(url);
+      if (!fileId) {
+        throw new Error("Could not extract file ID from URL");
+      }
+
+      // Create a standardized Google Drive video URL
+      const standardUrl = `https://drive.google.com/file/d/${fileId}/view`;
+      
+      // Open the video in a new tab and start transcription
+      const newTab = await chrome.tabs.create({ 
+        url: standardUrl, 
+        active: false // Don't switch to the new tab
+      });
+
+      // Wait for the tab to load
+      await this.waitForTabLoad(newTab.id);
+      
+      // Get current settings
+      const settings = {
+        language: this.elements.language.value,
+        continuousMode: this.elements.continuousMode.checked,
+        timestamps: true, // Enable timestamps for URL transcription
+        punctuation: true, // Enable punctuation for better formatting
+      };
+
+      // Start transcription in the new tab
+      chrome.tabs.sendMessage(newTab.id, {
+        action: "TRANSCRIBE_FULL_VIDEO",
+        settings: settings,
+        sourceUrl: url
+      });
+
+      this.isTranscribing = true;
+      this.updateUI();
+      this.updateStatus("Transcribing video from URL...", "transcribing");
+      
+    } catch (error) {
+      console.error("Error transcribing from URL:", error);
+      this.updateStatus("Failed to transcribe from URL: " + error.message, "error");
+    }
+  }
+
+  extractFileIdFromUrl(url) {
+    // Extract file ID from various Google Drive URL formats
+    const patterns = [
+      /\/file\/d\/([a-zA-Z0-9_-]+)/, // Standard share URL
+      /\/d\/([a-zA-Z0-9_-]+)/, // Docs URL format
+      /[?&]id=([a-zA-Z0-9_-]+)/ // Open URL format
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  }
+
+  async waitForTabLoad(tabId) {
+    return new Promise((resolve) => {
+      const checkTab = async () => {
+        try {
+          const tab = await chrome.tabs.get(tabId);
+          if (tab.status === 'complete') {
+            // Wait a bit more for the page to fully initialize
+            setTimeout(resolve, 2000);
+          } else {
+            setTimeout(checkTab, 500);
+          }
+        } catch (error) {
+          resolve(); // Tab might have been closed
+        }
+      };
+      checkTab();
+    });
+  }
+
+  clearUrl() {
+    this.elements.videoUrlInput.value = "";
+    this.validateUrl();
   }
 }
 

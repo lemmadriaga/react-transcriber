@@ -6,12 +6,14 @@ A modern Chrome extension for high-accuracy video transcription of Google Drive 
 
 - **Real-time transcription** of Google Drive videos using Web Speech Recognition API
 - **Full video transcription** without needing to play the entire video
+- **Direct URL transcription** - paste any Google Drive video link and transcribe it
 - **Modern design** with glass morphism effects and gradient backgrounds
 - **Multi-language support** with 12+ languages including English, Spanish, French, German, Japanese, etc.
 - **Progress tracking** with visual progress bars and status indicators
 - **Download transcripts** as text files for offline use
 - **Continuous recognition** for uninterrupted transcription
 - **Chrome CSP compliant** with self-contained styling (no external CDN dependencies)
+- **Private video support** - works with private, shared, and public Google Drive videos
 
 ## Personal Touch
 
@@ -37,9 +39,9 @@ Made with 💜 by **Lemuel Madriaga** for **Allyson Cabading - Madriaga** (soon)
 7. Download the transcript using the "Download Transcript" button
 
 ### Full Video Transcription
-1. Navigate to a Google Drive video
-2. Click "Transcribe Full Video" for complete transcription without playback
-3. The extension will extract audio and process it in chunks
+1. Navigate to a Google Drive video OR paste a URL in the Direct Link section
+2. Click "Transcribe Full Video" for complete transcription without manual playback
+3. The extension will automatically play and process the video
 4. Monitor progress with the visual progress bar
 5. Download the complete transcript when finished
 
