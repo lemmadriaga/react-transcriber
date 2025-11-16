@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Transcription Overlay</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: white;
+        border-radius: 8px;
+      }
+      .transcription-container {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .transcription-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #202124;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .timestamp {
+        color: #5f6368;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .speaker {
+        color: #1a73e8;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="transcription-container">
+      <div class="transcription-text" id="transcription-content">
+        <!-- Transcription content will be inserted here -->
+      </div>
+    </div>
+
+    <script>
+      // This file can be used for iframe-based overlays if needed
+      window.addEventListener("message", function (event) {
+        if (event.data.type === "UPDATE_TRANSCRIPTION") {
+          const content = document.getElementById("transcription-content");
+          content.innerHTML = event.data.text;
+        }
+      });
+    </script>
+  </body>
+</html>

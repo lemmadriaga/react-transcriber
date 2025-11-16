@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Transcriber Pro</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Poppins Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Flaticon CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-rounded/css/uicons-bold-rounded.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css"
+    />
+
+    <style>
+      * {
+        font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      body {
+        width: 380px;
+        max-height: 600px;
+        overflow-y: auto;
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+      }
+
+      .btn-gradient:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        transition: all 0.3s ease;
+      }
+
+      .btn-secondary:hover {
+        background: linear-gradient(135deg, #ee84e9 0%, #f3475a 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+      }
+
+      .status-indicator {
+        animation: pulse-soft 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-soft {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      .processing-spinner {
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #5a6fd8, #6a4190);
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-slate-50 to-gray-100 p-0">
+    <!-- Header -->
+    <div class="gradient-bg px-6 py-5 text-white relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10">
+        <div
+          class="absolute top-2 left-2 w-20 h-20 bg-white rounded-full"
+        ></div>
+        <div
+          class="absolute bottom-2 right-2 w-16 h-16 bg-white rounded-full"
+        ></div>
+      </div>
+      <div class="relative z-10 text-center">
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <i class="fi fi-br-microphone text-2xl"></i>
+          <h1 class="text-xl font-bold">Video Transcriber Pro</h1>
+        </div>
+        <p class="text-sm opacity-90">
+          High-accuracy transcription for Google Drive videos
+        </p>
+      </div>
+    </div>
+
+    <div class="p-5 space-y-5">
+      <!-- Status Section -->
+      <div class="glass-effect rounded-xl p-4 shadow-lg">
+        <div
+          id="status"
+          class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-green-50 text-green-700 text-sm font-medium"
+        >
+          <div class="w-2 h-2 bg-green-500 rounded-full status-indicator"></div>
+          Ready to transcribe
+        </div>
+
+        <!-- Processing Indicator -->
+        <div
+          class="hidden mt-3 flex items-center justify-center gap-3 px-4 py-2 rounded-lg bg-blue-50 text-blue-700"
+          id="processingIndicator"
+        >
+          <div
+            class="w-4 h-4 border-2 border-blue-300 border-t-blue-600 rounded-full processing-spinner"
+          ></div>
+          <span id="processingText" class="text-sm font-medium"
+            >Processing audio...</span
+          >
+        </div>
+
+        <!-- Progress Bar -->
+        <div
+          class="hidden mt-3 w-full bg-gray-200 rounded-full h-2"
+          id="progressContainer"
+        >
+          <div
+            class="bg-gradient-to-r from-purple-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+            id="progressBar"
+            style="width: 0%"
+          ></div>
+        </div>
+      </div>
+
+      <!-- Transcription Mode -->
+      <div class="glass-effect rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-2 mb-3">
+          <i class="fi fi-rr-settings text-slate-600"></i>
+          <h3 class="font-semibold text-slate-700">Transcription Mode</h3>
+        </div>
+        <select
+          id="transcriptionMode"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+        >
+          <option value="live">Live Transcription (Play Required)</option>
+          <option value="full">Full Video Transcription (No Playback)</option>
+        </select>
+      </div>
+
+      <!-- Control Buttons -->
+      <div class="glass-effect rounded-xl p-4 shadow-lg space-y-3">
+        <div class="flex gap-2">
+          <button
+            id="startTranscription"
+            class="flex-1 btn-gradient text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+          >
+            <i class="fi fi-rr-play text-sm"></i>
+            Start Live
+          </button>
+          <button
+            id="stopTranscription"
+            class="flex-1 bg-gray-400 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-gray-500 transition-all"
+            disabled
+          >
+            <i class="fi fi-rr-stop text-sm"></i>
+            Stop
+          </button>
+        </div>
+
+        <button
+          id="transcribeFullVideo"
+          class="w-full btn-secondary text-white px-4 py-3 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+        >
+          <i class="fi fi-sr-video-camera text-lg"></i>
+          Transcribe Entire Video
+        </button>
+
+        <div class="flex gap-2">
+          <button
+            id="downloadTranscript"
+            class="flex-1 bg-slate-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-600 transition-all"
+            disabled
+          >
+            <i class="fi fi-rr-download text-sm"></i>
+            Download
+          </button>
+          <button
+            id="copyTranscript"
+            class="flex-1 bg-slate-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-slate-600 transition-all"
+            disabled
+          >
+            <i class="fi fi-rr-copy text-sm"></i>
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="glass-effect rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-2 mb-3">
+          <i class="fi fi-rr-eye text-slate-600"></i>
+          <h3 class="font-semibold text-slate-700">Live Preview</h3>
+        </div>
+        <div
+          id="transcriptionPreview"
+          class="bg-slate-50 rounded-lg p-3 min-h-[80px] max-h-[120px] overflow-y-auto text-sm text-slate-700 custom-scrollbar"
+        >
+          Transcription will appear here...
+        </div>
+      </div>
+
+      <!-- Settings -->
+      <div class="glass-effect rounded-xl p-4 shadow-lg">
+        <div class="flex items-center gap-2 mb-4">
+          <i class="fi fi-rr-settings-sliders text-slate-600"></i>
+          <h3 class="font-semibold text-slate-700">Settings</h3>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1"
+              >Language</label
+            >
+            <select
+              id="language"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+            >
+              <option value="en-US">🇺🇸 English (US)</option>
+              <option value="en-GB">🇬🇧 English (UK)</option>
+              <option value="es-ES">🇪🇸 Spanish</option>
+              <option value="fr-FR">🇫🇷 French</option>
+              <option value="de-DE">🇩🇪 German</option>
+              <option value="it-IT">🇮🇹 Italian</option>
+              <option value="pt-BR">🇧🇷 Portuguese (Brazil)</option>
+              <option value="ja-JP">🇯🇵 Japanese</option>
+              <option value="ko-KR">🇰🇷 Korean</option>
+              <option value="zh-CN">🇨🇳 Chinese (Simplified)</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label
+              class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="punctuation"
+                checked
+                class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 focus:ring-2"
+              />
+              <i class="fi fi-rr-quote-right text-sm text-slate-600"></i>
+              <span class="font-medium">Auto-punctuation</span>
+            </label>
+
+            <label
+              class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="timestamps"
+                checked
+                class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 focus:ring-2"
+              />
+              <i class="fi fi-rr-clock text-sm text-slate-600"></i>
+              <span class="font-medium">Include timestamps</span>
+            </label>
+
+            <label
+              class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                id="speakerLabels"
+                class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 focus:ring-2"
+              />
+              <i class="fi fi-rr-users text-sm text-slate-600"></i>
+              <span class="font-medium">Speaker identification</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Credit -->
+      <div class="glass-effect rounded-xl p-4 shadow-lg text-center">
+        <div class="text-xs text-slate-600 leading-relaxed">
+          <div class="flex items-center justify-center gap-1 mb-1">
+            <i class="fi fi-rr-heart text-pink-500"></i>
+            <span class="font-medium">Made with love by</span>
+          </div>
+          <div class="font-semibold text-slate-700">Lemuel Madriaga</div>
+          <div class="text-slate-500">for</div>
+          <div class="font-semibold text-purple-600">
+            Allyson Cabading - Madriaga
+          </div>
+          <div class="text-slate-500">(soon) 💍</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
