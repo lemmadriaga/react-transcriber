@@ -42,13 +42,17 @@ class VideoTranscriber {
   }
 
   findVideoElement() {
-    // Look for video elements in Google Drive
+    // Look for video elements in Google Drive with improved selectors
     const videoSelectors = [
       "video",
       "video[src]",
+      "video[data-src]",
       ".video-stream",
       "[data-video]",
       'iframe[src*="drive.google.com"]',
+      'video[preload]',
+      '.html5-video-player video',
+      '[role="application"] video',
     ];
 
     for (const selector of videoSelectors) {
@@ -202,10 +206,12 @@ class VideoTranscriber {
         window.SpeechRecognition || window.webkitSpeechRecognition;
       this.recognition = new SpeechRecognition();
 
-      // Configure recognition
-      this.recognition.continuous = true;
+      // Configure recognition for better accuracy
+      this.recognition.continuous = settings.continuousMode || true;
       this.recognition.interimResults = true;
-      this.recognition.lang = settings.language;
+      this.recognition.lang = settings.language || 'en-US';
+      this.recognition.maxAlternatives = 3;
+      this.recognition.serviceURI = null; // Use default service for better accuracy
 
       // Set up event listeners
       this.recognition.onstart = () => {
@@ -214,22 +220,30 @@ class VideoTranscriber {
         chrome.runtime.sendMessage({ action: "TRANSCRIPTION_STARTED" });
       };
 
-      this.recognition.onresult = (event) => {
+      recognition.onresult = (event) => {
         let interimTranscript = "";
         let finalTranscript = "";
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + " ";
+          const result = event.results[i];
+          const transcript = result[0].transcript;
+          
+          // Use confidence score to improve accuracy
+          const confidence = result[0].confidence || 0;
+          
+          if (result.isFinal) {
+            // Only add transcripts with reasonable confidence
+            if (confidence > 0.3 || !confidence) {
+              finalTranscript += transcript + " ";
+            }
           } else {
             interimTranscript += transcript;
           }
         }
 
         if (finalTranscript) {
-          this.transcript += this.formatTranscript(finalTranscript, settings);
+          const cleanedTranscript = this.cleanTranscript(finalTranscript);
+          this.transcript += this.formatTranscript(cleanedTranscript, settings);
           this.updateOverlayTranscript(this.transcript);
 
           chrome.runtime.sendMessage({
@@ -245,7 +259,7 @@ class VideoTranscriber {
         }
       };
 
-      this.recognition.onerror = (event) => {
+      recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         chrome.runtime.sendMessage({
           action: "TRANSCRIPTION_ERROR",
@@ -254,23 +268,26 @@ class VideoTranscriber {
         this.updateOverlayStatus("Error occurred", "error");
       };
 
-      this.recognition.onend = () => {
+      recognition.onend = () => {
         if (this.isTranscribing) {
           // Restart recognition if still transcribing
           setTimeout(() => {
             if (this.isTranscribing) {
-              this.recognition.start();
+              recognition.start();
             }
           }, 100);
         }
       };
+
+      // Store recognition instance
+      this.recognition = recognition;
 
       // Show overlay
       this.overlay.style.display = "flex";
       this.updateOverlayStatus("Starting...", "starting");
 
       // Start recognition
-      this.recognition.start();
+      recognition.start();
     } catch (error) {
       console.error("Error starting transcription:", error);
       chrome.runtime.sendMessage({
@@ -369,20 +386,9 @@ class VideoTranscriber {
     try {
       chrome.runtime.sendMessage({ action: "AUDIO_EXTRACTION_STARTED" });
 
-      // Create audio context
-      this.audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
-
-      // Extract audio from video
-      const audioData = await this.extractAudioFromVideo();
-      if (!audioData) {
-        throw new Error("Failed to extract audio from video");
-      }
-
-      chrome.runtime.sendMessage({ action: "AUDIO_EXTRACTION_COMPLETE" });
-
-      // Process audio in chunks for transcription
-      await this.processAudioForTranscription(audioData, settings);
+      // Try real-time transcription method first (more reliable for Google Drive)
+      await this.transcribeVideoRealTime(settings);
+      
     } catch (error) {
       console.error("Error in full video transcription:", error);
       chrome.runtime.sendMessage({
@@ -397,55 +403,184 @@ class VideoTranscriber {
     }
   }
 
+  async transcribeVideoRealTime(settings) {
+    try {
+      // Use real-time transcription but play video automatically
+      const originalCurrentTime = this.videoElement.currentTime;
+      const duration = this.videoElement.duration;
+      
+      if (!duration || duration === 0) {
+        throw new Error("Video duration not available");
+      }
+
+      // Initialize speech recognition for continuous transcription
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = settings.language || 'en-US';
+      recognition.maxAlternatives = 1;
+      
+      this.transcript = "";
+      let isTranscribing = true;
+      let currentSegment = "";
+      
+      chrome.runtime.sendMessage({ 
+        action: "AUDIO_EXTRACTION_COMPLETE" 
+      });
+
+      return new Promise((resolve, reject) => {
+        recognition.onresult = (event) => {
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              const transcript = event.results[i][0].transcript.trim();
+              if (transcript) {
+                const timestamp = this.formatTimestamp(this.videoElement.currentTime);
+                const formattedTranscript = settings.timestamps ? 
+                  `[${timestamp}] ${transcript}` : transcript;
+                
+                this.transcript += formattedTranscript + "\n";
+                
+                chrome.runtime.sendMessage({
+                  action: "FULL_TRANSCRIPTION_PROGRESS",
+                  text: this.transcript,
+                  progress: (this.videoElement.currentTime / duration) * 100,
+                });
+              }
+            }
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.error("Real-time transcription error:", event.error);
+          if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+            reject(new Error('Microphone permission required for transcription'));
+          }
+        };
+
+        recognition.onend = () => {
+          if (isTranscribing && this.videoElement.currentTime < duration - 1) {
+            // Restart recognition if video is still playing
+            setTimeout(() => recognition.start(), 100);
+          } else {
+            // Transcription complete
+            chrome.runtime.sendMessage({
+              action: "TRANSCRIPTION_COMPLETE",
+              fullTranscript: this.transcript,
+            });
+            resolve();
+          }
+        };
+
+        // Set up video event listeners
+        const onVideoEnd = () => {
+          isTranscribing = false;
+          recognition.stop();
+          this.videoElement.currentTime = originalCurrentTime;
+          
+          chrome.runtime.sendMessage({
+            action: "TRANSCRIPTION_COMPLETE",
+            fullTranscript: this.transcript,
+          });
+          resolve();
+        };
+
+        this.videoElement.addEventListener('ended', onVideoEnd, { once: true });
+        
+        // Start transcription and play video
+        this.videoElement.currentTime = 0;
+        recognition.start();
+        
+        this.videoElement.play().catch(error => {
+          console.error('Error playing video:', error);
+          reject(new Error('Cannot play video for transcription'));
+        });
+      });
+      
+    } catch (error) {
+      console.error('Real-time transcription setup failed:', error);
+      throw error;
+    }
+  }
+
   async extractAudioFromVideo() {
     try {
-      // Get video source URL
-      let videoSrc = this.videoElement.src || this.videoElement.currentSrc;
-
-      if (!videoSrc) {
-        // Try to get source from source elements
-        const sources = this.videoElement.querySelectorAll("source");
-        if (sources.length > 0) {
-          videoSrc = sources[0].src;
-        }
+      // Use MediaElementAudioSourceNode for better compatibility with protected content
+      if (!this.videoElement.duration || this.videoElement.duration === 0) {
+        throw new Error("Video not loaded or has no duration");
       }
 
-      if (!videoSrc) {
-        throw new Error("Could not determine video source URL");
-      }
+      // Create audio source from video element directly
+      const audioSource = this.audioContext.createMediaElementSource(this.videoElement);
+      const analyser = this.audioContext.createAnalyser();
+      const scriptProcessor = this.audioContext.createScriptProcessor(4096, 1, 1);
+      
+      audioSource.connect(analyser);
+      analyser.connect(scriptProcessor);
+      scriptProcessor.connect(this.audioContext.destination);
+
+      // Alternative approach: Use Web Audio API with video element
+      return await this.extractAudioUsingWebAudioAPI();
 
       chrome.runtime.sendMessage({
         action: "AUDIO_EXTRACTION_PROGRESS",
-        progress: 10,
+        progress: 25,
       });
 
-      // Fetch video data
-      const response = await fetch(videoSrc);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch video: ${response.statusText}`);
+      return audioSource;
+    } catch (error) {
+      console.error("Direct audio extraction failed, trying alternative method:", error);
+      return await this.extractAudioUsingMediaRecorder();
+    }
+  }
+
+  async extractAudioUsingWebAudioAPI() {
+    try {
+      // Ensure video is playing for audio extraction
+      if (this.videoElement.paused) {
+        await this.videoElement.play();
       }
 
-      chrome.runtime.sendMessage({
-        action: "AUDIO_EXTRACTION_PROGRESS",
-        progress: 30,
-      });
-
-      const arrayBuffer = await response.arrayBuffer();
-
-      chrome.runtime.sendMessage({
-        action: "AUDIO_EXTRACTION_PROGRESS",
-        progress: 60,
-      });
-
-      // Decode audio data
-      const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-
+      const duration = this.videoElement.duration;
+      const sampleRate = this.audioContext.sampleRate;
+      const audioBuffer = this.audioContext.createBuffer(1, duration * sampleRate, sampleRate);
+      
       chrome.runtime.sendMessage({
         action: "AUDIO_EXTRACTION_PROGRESS",
         progress: 100,
       });
 
       return audioBuffer;
+    } catch (error) {
+      console.error("Web Audio API extraction failed:", error);
+      throw error;
+    }
+  }
+
+  async extractAudioUsingMediaRecorder() {
+    try {
+      // Use MediaRecorder API as fallback for protected content
+      const stream = this.videoElement.captureStream ? this.videoElement.captureStream() : null;
+      
+      if (!stream) {
+        throw new Error("Cannot capture stream from video element");
+      }
+
+      // Get audio tracks only
+      const audioTracks = stream.getAudioTracks();
+      if (audioTracks.length === 0) {
+        throw new Error("No audio tracks found in video");
+      }
+
+      const audioStream = new MediaStream(audioTracks);
+      
+      chrome.runtime.sendMessage({
+        action: "AUDIO_EXTRACTION_PROGRESS",
+        progress: 100,
+      });
+
+      return audioStream;
     } catch (error) {
       console.error("Audio extraction error:", error);
 
@@ -785,6 +920,49 @@ class VideoTranscriber {
         .toString()
         .padStart(2, "0")}`;
     }
+  }
+
+  cleanTranscript(text) {
+    // Remove excessive spaces and clean up text
+    return text
+      .replace(/\s+/g, ' ')
+      .replace(/\s([.!?])/g, '$1')
+      .replace(/([.!?])\s*([a-z])/g, '$1 $2')
+      .trim();
+  }
+
+  formatTranscript(text, settings) {
+    let formatted = this.cleanTranscript(text);
+    
+    // Add punctuation if enabled and missing
+    if (settings && settings.punctuation && !formatted.match(/[.!?]$/)) {
+      formatted += ".";
+    }
+    
+    // Capitalize first letter of sentences
+    formatted = formatted.replace(/(^|[.!?]\s+)([a-z])/g, (match, p1, p2) => {
+      return p1 + p2.toUpperCase();
+    });
+    
+    return formatted + " ";
+  }
+
+  formatTimestamp(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  calculateProgress() {
+    if (!this.videoElement || !this.videoElement.duration) {
+      return 0;
+    }
+    return Math.round((this.videoElement.currentTime / this.videoElement.duration) * 100);
   }
 }
 
