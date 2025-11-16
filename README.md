@@ -1,145 +1,49 @@
-# Video Transcriber Pro - Chrome Extension
+# Video Transcriber Pro
 
-A high-accuracy Chrome extension for transcribing videos from Google Drive with real-time speech recognition. Built with modern design using **Tailwind CSS**, **Poppins font**, and **Flaticon** for a beautiful user experience.
-
-## ✨ Design Features
-
-🎨 **Modern UI**: Built with Tailwind CSS for a sleek, professional interface  
-📖 **Beautiful Typography**: Uses Poppins font for excellent readability  
-🔄 **Modern Icons**: Flaticon integration for crisp, modern iconography  
-🌈 **Gradient Design**: Beautiful gradient backgrounds and glass morphism effects  
-🌙 **Dark Mode Support**: Automatic dark mode detection and support  
-♿ **Accessibility**: High contrast mode and reduced motion support  
-📱 **Responsive**: Optimized for different screen sizes
-
----
-
-💖 **Made with love by Lemuel Madriaga for Allyson Cabading - Madriaga (soon) 💍**
-
----
+A modern Chrome extension for high-accuracy video transcription of Google Drive videos with beautiful UI design.
 
 ## Features
 
-🎙️ **Real-time Transcription**: Live transcription of Google Drive videos with high accuracy
-🎬 **Full Video Transcription**: Transcribe entire videos without needing to watch them
-📝 **Multiple Language Support**: Support for 10+ languages including English, Spanish, French, German, and more
-⚡ **Live Preview**: Real-time transcription preview in a floating overlay
-📊 **Speaker Identification**: Optional speaker labeling for multi-person conversations
-⏰ **Timestamps**: Optional timestamp inclusion for better organization
-📋 **Export Options**: Download transcripts as text files or copy to clipboard
-🎛️ **Customizable Settings**: Adjustable language, punctuation, and formatting options
-🔒 **Privacy-Focused**: All processing happens locally in your browser
+- **Real-time transcription** of Google Drive videos using Web Speech Recognition API
+- **Full video transcription** without needing to play the entire video
+- **Modern design** with glass morphism effects and gradient backgrounds
+- **Multi-language support** with 12+ languages including English, Spanish, French, German, Japanese, etc.
+- **Progress tracking** with visual progress bars and status indicators
+- **Download transcripts** as text files for offline use
+- **Continuous recognition** for uninterrupted transcription
+- **Chrome CSP compliant** with self-contained styling (no external CDN dependencies)
 
-## Transcription Modes
+## Personal Touch
 
-### Live Transcription Mode
-
-- Requires playing the video
-- Real-time transcription as the video plays
-- Best for shorter videos or when you want to watch while transcribing
-- Lower resource usage
-
-### Full Video Transcription Mode ⭐ **NEW**
-
-- **No need to watch or play the video**
-- Processes the entire video automatically
-- Extracts audio and transcribes in chunks
-- Perfect for long videos, meetings, or when you just need the text
-- Works completely in the background
+Made with 💜 by **Lemuel Madriaga** for **Allyson Cabading - Madriaga** (soon)
 
 ## Installation
 
-### Method 1: Load as Unpacked Extension (Development)
+1. Download or clone this extension folder
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Enable "Developer mode" in the top right
+4. Click "Load unpacked" and select the extension folder
+5. The extension icon will appear in your toolbar
 
-1. **Download the Extension**
+## Usage
 
-   - Download all the files from this folder
-   - Make sure you have all these files:
-     - `manifest.json`
-     - `popup.html`
-     - `popup.js`
-     - `background.js`
-     - `content.js`
-     - `styles.css`
-     - `icons/` folder with included icon files (icon16.png, icon48.png, icon128.png)
+### Real-time Transcription
+1. Navigate to any Google Drive video
+2. Click the extension icon to open the popup
+3. Select your preferred language from the dropdown
+4. Click "Start Transcription" to begin real-time transcription
+5. The transcription will appear in the Live Preview area
+6. Click "Stop" to end the session
+7. Download the transcript using the "Download Transcript" button
 
-2. **Open Chrome Extensions Page**
+### Full Video Transcription
+1. Navigate to a Google Drive video
+2. Click "Transcribe Full Video" for complete transcription without playback
+3. The extension will extract audio and process it in chunks
+4. Monitor progress with the visual progress bar
+5. Download the complete transcript when finished
 
-   - Open Google Chrome
-   - Go to `chrome://extensions/`
-   - Enable "Developer mode" in the top right corner
-
-3. **Load the Extension**
-
-   - Click "Load unpacked"
-   - Select the folder containing the extension files
-   - The extension should now appear in your extensions list
-
-4. **Pin the Extension**
-   - Click the puzzle piece icon in the Chrome toolbar
-   - Find "Video Transcriber Pro" and click the pin icon
-
-### Method 2: Custom Icon Files (Optional)
-
-The extension comes with beautiful gradient microphone icons, but if you want to customize them, you can replace these files in the `icons/` folder:
-
-- `icon16.png` (16x16 pixels) - Toolbar icon
-- `icon48.png` (48x48 pixels) - Extension management page
-- `icon128.png` (128x128 pixels) - Chrome Web Store and installation
-
-You can use any image editing software or online icon generators to create these. The current icons feature a purple-to-blue gradient background with a white microphone symbol.## How to Use
-
-### Method 1: Full Video Transcription (Recommended for most use cases)
-
-1. **Navigate to Google Drive**
-
-   - Go to `drive.google.com`
-   - Open any video file (MP4, MOV, etc.)
-
-2. **Start Full Video Transcription**
-
-   - Click the Video Transcriber Pro icon in the toolbar
-   - Configure your settings (language, timestamps, etc.)
-   - Click "🎬 Transcribe Entire Video"
-   - **No need to play or watch the video!**
-   - The extension will automatically extract audio and process it
-
-3. **Monitor Progress**
-
-   - Watch the progress indicator for audio extraction and transcription
-   - Live preview shows transcription as it's processed
-   - The process continues in the background
-
-### Method 2: Live Transcription (Real-time)
-
-1. **Navigate to Google Drive**
-
-   - Go to `drive.google.com`
-   - Open any video file (MP4, MOV, etc.)
-
-2. **Start Live Transcription**
-
-   - Click the Video Transcriber Pro icon in the toolbar
-   - Select "Live Transcription" mode in settings
-   - Configure your settings (language, timestamps, etc.)
-   - Click "Start Live Transcription"
-   - **Play the video** to begin transcription
-
-3. **View Live Transcription**
-
-   - A floating overlay will appear showing real-time transcription
-   - The overlay is draggable and can be repositioned
-   - Live text preview is also available in the popup
-
-### Downloading Results
-
-4. **Download or Copy Results**
-   - Once complete, download the transcript as a text file
-   - Or copy the text directly to your clipboard
-
-## Supported Features
-
-### Languages
+## Supported Languages
 
 - English (US/UK)
 - Spanish
@@ -150,97 +54,95 @@ You can use any image editing software or online icon generators to create these
 - Japanese
 - Korean
 - Chinese (Simplified)
+- Arabic
+- Russian
+- And more...
 
-### Settings
+## Technical Details
 
-- **Auto-punctuation**: Automatically adds punctuation to transcripts
-- **Timestamps**: Includes time markers for better organization
-- **Speaker identification**: Attempts to identify different speakers (experimental)
+### Architecture
+- **Manifest V3** for modern Chrome extension standards
+- **Web Speech Recognition API** for high-accuracy transcription
+- **Audio Context API** for advanced audio processing
+- **Chrome Storage API** for settings persistence
+- **Self-contained CSS** for CSP compliance (no external dependencies)
 
-### Export Formats
+### Files Structure
+- `manifest.json` - Extension configuration and permissions
+- `popup.html` - Modern UI interface with glass morphism design
+- `popup.js` - Main popup logic and user interactions
+- `content.js` - Video detection and transcription processing
+- `background.js` - Service worker for background tasks
+- `styles.css` - Advanced styling for content script overlays
+- `icons/` - Extension icons (16px, 48px, 128px) with gradient design
 
-- Plain text (TXT)
-- Clipboard copy
-- Timestamped format
+### Design Features
+- **Glass morphism effects** with backdrop blur
+- **Gradient backgrounds** with purple-blue color scheme
+- **Animated status indicators** with pulse effects
+- **Custom scrollbars** with branded styling
+- **Progress visualization** with smooth animations
+- **Responsive design** optimized for popup interface
+- **Accessibility features** with proper contrast and focus states
 
-## Browser Compatibility
+### CSP Compliance
+This extension is fully Content Security Policy compliant:
+- No external CDN dependencies (Tailwind CSS was replaced with custom CSS)
+- All fonts and icons are handled locally or via CSP-allowed sources
+- Modern emoji icons used instead of external icon fonts
+- Self-contained styling for optimal security
 
-- **Chrome**: Full support (recommended)
-- **Edge**: Full support
-- **Firefox**: Limited support (Web Speech API restrictions)
-- **Safari**: Not supported (no Web Speech API)
+## Browser Requirements
+
+- Chrome 88+ (required for Manifest V3)
+- Secure context (HTTPS) for Web Speech Recognition API
+- Microphone permissions for speech recognition
+- Google Drive access for video transcription
 
 ## Privacy & Security
 
-- **Local Processing**: All transcription happens in your browser
-- **No Data Transmission**: Audio is not sent to external servers
-- **Google Drive Integration**: Only reads video content, no file access
-- **Secure Storage**: Transcripts stored locally in browser storage
-
-## Technical Requirements
-
-- Chrome 25+ or Edge 79+
-- Microphone permissions (for speech recognition)
-- Active internet connection (for accessing Google Drive)
-- JavaScript enabled
+- All transcription processing happens locally in your browser
+- No data is sent to external servers
+- Uses Chrome's built-in speech recognition
+- Minimal permissions for enhanced security
+- Works with private Google Drive videos
 
 ## Troubleshooting
 
-### "No video found on this page"
+### Extension not loading
+- Ensure all files are in the same directory
+- Check that icons folder contains all three PNG files
+- Reload the extension in chrome://extensions/
 
-- Make sure you're on a Google Drive video page
-- Refresh the page and try again
-- Check that the video is fully loaded
+### Transcription not working
+- Ensure microphone permissions are granted
+- Check that you're on a Google Drive video page
+- Verify internet connection for speech recognition
+- Make sure the video has audio content
 
-### "Web Speech API not supported"
+### UI not displaying correctly
+- The extension now uses self-contained CSS for full compatibility
+- No external CDNs are required
+- All modern styling is embedded in the popup
 
-- Update your browser to the latest version
-- Try using Chrome or Edge instead of Firefox/Safari
-- Check that JavaScript is enabled
+## Future Enhancements
 
-### Transcription not starting
-
-- Grant microphone permissions when prompted
-- Check that your microphone is working
-- Try refreshing the page and reloading the extension
-
-### Poor transcription accuracy
-
-- Ensure clear audio quality
-- Reduce background noise
-- Try adjusting the language setting
-- Speak clearly and at a moderate pace
-
-## Known Limitations
-
-- Requires active internet connection for speech recognition
-- Accuracy depends on audio quality and speaker clarity
-- Some video formats may not be fully supported
-- Cross-origin video restrictions may apply to embedded content
+- Additional language support
+- Export to multiple formats (PDF, DOCX)
+- Timestamp support for longer videos
+- Speaker identification for multi-person videos
+- Integration with other video platforms
 
 ## Version History
 
-### v1.0.0 (Initial Release)
-
-- Real-time video transcription
-- Multiple language support
-- Live preview overlay
-- Export functionality
-- Google Drive integration
-
-## Support
-
-For issues, suggestions, or feature requests:
-
-1. Check the troubleshooting section above
-2. Verify all files are properly installed
-3. Check browser console for error messages
-4. Ensure microphone permissions are granted
-
-## License
-
-This extension is provided as-is for educational and personal use. Please respect copyright laws and terms of service for the videos you transcribe.
+### v1.0.0
+- Initial release with modern UI design
+- Real-time and full video transcription
+- Multi-language support
+- Glass morphism design with gradients
+- CSP-compliant self-contained styling
+- Professional icon set with gradient microphone design
 
 ---
 
-**Note**: This extension uses the browser's built-in Web Speech Recognition API, which may send audio to speech recognition services. Check your browser's privacy settings for more information.
+*Extension created with love for modern video transcription needs* ✨
