@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Transcriber - Demo</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .demo-card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .demo-button {
+        background: linear-gradient(45deg, #4285f4, #34a853);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 10px;
+        transition: all 0.3s ease;
+      }
+      .demo-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+      }
+      .feature-list {
+        text-align: left;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .feature-list li {
+        margin-bottom: 10px;
+        padding-left: 10px;
+      }
+      .instructions {
+        background: #e8f5e8;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .note {
+        background: #fff3cd;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-card">
+      <h1>🎥 Google Drive Video Transcriber</h1>
+      <p>Professional video transcription with PDF and text export</p>
+
+      <a href="transcriber.html" class="demo-button">Launch Transcriber</a>
+
+      <div class="instructions">
+        <h3>📋 Quick Start Instructions:</h3>
+        <ol>
+          <li>Click "Launch Transcriber" above</li>
+          <li>Upload a video file or connect to Google Drive</li>
+          <li>Configure transcription settings</li>
+          <li>Start transcription and wait for results</li>
+          <li>Download as PDF or text file</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="demo-card">
+      <h2>🌟 Key Features</h2>
+      <ul class="feature-list">
+        <li>
+          ✅ <strong>Multi-format support</strong> - MP4, AVI, MOV, WMV, and
+          more
+        </li>
+        <li>
+          ✅ <strong>10+ languages</strong> - English, Spanish, French, German,
+          etc.
+        </li>
+        <li>
+          ✅ <strong>Timestamp integration</strong> - Optional time markers
+        </li>
+        <li>
+          ✅ <strong>Speaker identification</strong> - Distinguish multiple
+          speakers
+        </li>
+        <li>
+          ✅ <strong>PDF export</strong> - Professional formatted documents
+        </li>
+        <li>✅ <strong>Text export</strong> - Plain text file downloads</li>
+        <li>
+          ✅ <strong>Google Drive integration</strong> - Access private videos
+        </li>
+        <li>
+          ✅ <strong>Real-time editing</strong> - Modify transcription results
+        </li>
+        <li>
+          ✅ <strong>Progress tracking</strong> - Live transcription updates
+        </li>
+        <li>
+          ✅ <strong>Privacy focused</strong> - Local processing when possible
+        </li>
+      </ul>
+    </div>
+
+    <div class="demo-card">
+      <h2>🔧 Technical Information</h2>
+      <div class="note">
+        <strong>Note:</strong> This is a demonstration application. For
+        production use:
+        <ul style="margin-top: 10px; margin-bottom: 0">
+          <li>Configure Google Drive API credentials</li>
+          <li>Set up professional speech recognition service</li>
+          <li>Implement server-side processing for large files</li>
+          <li>Add user authentication and data persistence</li>
+        </ul>
+      </div>
+
+      <h3>Browser Requirements:</h3>
+      <ul class="feature-list">
+        <li>Chrome 60+ (recommended)</li>
+        <li>Firefox 55+</li>
+        <li>Safari 11+</li>
+        <li>Edge 79+</li>
+      </ul>
+
+      <h3>Supported File Types:</h3>
+      <ul class="feature-list">
+        <li>Video: MP4, AVI, MOV, WMV, WebM, MKV</li>
+        <li>Max size: 500MB per file</li>
+        <li>Duration: Up to 2 hours</li>
+      </ul>
+    </div>
+
+    <div class="demo-card">
+      <h2>🚀 Getting Started</h2>
+      <p>Ready to transcribe your first video?</p>
+      <a href="transcriber.html" class="demo-button">Open Video Transcriber</a>
+
+      <div style="margin-top: 20px">
+        <p>
+          <strong>Demo Files:</strong> For testing, try uploading any video file
+          from your computer.
+        </p>
+        <p>
+          <strong>Google Drive:</strong> Click "Connect to Google Drive" to
+          access your private videos.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      // Add some interactive elements
+      document.addEventListener("DOMContentLoaded", function () {
+        // Add click analytics (demo purposes)
+        const buttons = document.querySelectorAll(".demo-button");
+        buttons.forEach((button) => {
+          button.addEventListener("click", function () {
+            console.log("Demo button clicked:", this.textContent);
+          });
+        });
+
+        // Simple feature counter animation
+        const features = document.querySelectorAll(".feature-list li");
+        features.forEach((feature, index) => {
+          setTimeout(() => {
+            feature.style.opacity = "0";
+            feature.style.transform = "translateX(-20px)";
+            feature.style.transition = "all 0.5s ease";
+
+            setTimeout(() => {
+              feature.style.opacity = "1";
+              feature.style.transform = "translateX(0)";
+            }, 50);
+          }, index * 100);
+        });
+      });
+    </script>
+  </body>
+</html>
