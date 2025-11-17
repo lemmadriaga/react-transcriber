@@ -1,0 +1,87 @@
+/* VideoUpload.css - Modern design with Tailwind-inspired styles */
+.video-upload-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.upload-section {
+  margin-bottom: 40px;
+}
+
+/* Upload Dropzone */
+.upload-dropzone {
+  border: 2px dashed #d0d0d0;
+  border-radius: 20px;
+  padding: 60px 40px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-dropzone::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(66, 133, 244, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.upload-dropzone:hover::before {
+  left: 100%;
+}
+
+.upload-dropzone:hover {
+  border-color: #4285f4;
+  background: rgba(66, 133, 244, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.upload-dropzone.drag-over {
+  border-color: #4285f4;
+  background: rgba(66, 133, 244, 0.1);
+  transform: scale(1.02);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .upload-dropzone {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-upload-container {
+    padding: 20px 15px;
+  }
+
+  .upload-dropzone {
+    padding: 30px 15px;
+  }
+}
+
+/* Animation Effects */
+.video-upload-container {
+  animation: uploadFadeIn 0.6s ease-out;
+}
+
+@keyframes uploadFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
