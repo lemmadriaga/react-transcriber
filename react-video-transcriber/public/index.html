@@ -5,18 +5,25 @@
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#4285f4" />
-    <meta name="description" content="Professional Video Transcriber for Google Drive videos with AI-powered transcription and PDF/Text export capabilities" />
-    
+    <meta
+      name="description"
+      content="Professional Video Transcriber for Google Drive videos with AI-powered transcription and PDF/Text export capabilities"
+    />
+
     <!-- Google APIs for Google Drive integration -->
     <script src="https://apis.google.com/js/api.js"></script>
-    
+    <script src="https://accounts.google.com/gsi/client"></script>
+
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <title>Video Transcriber Pro - AI-Powered Video Transcription</title>
-    
+
     <style>
       /* Loading styles */
       .initial-loading {
@@ -31,13 +38,13 @@
         align-items: center;
         z-index: 9999;
         color: white;
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
       }
-      
+
       .loading-content {
         text-align: center;
       }
-      
+
       .loading-spinner {
         width: 50px;
         height: 50px;
@@ -47,17 +54,21 @@
         animation: spin 1s linear infinite;
         margin: 0 auto 20px;
       }
-      
+
       @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
-      
+
       .loading-text {
         font-size: 1.2rem;
         font-weight: 500;
       }
-      
+
       /* Hide loading when React loads */
       #root:not(:empty) + .initial-loading {
         display: none;
@@ -67,7 +78,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
+
     <!-- Initial loading screen -->
     <div class="initial-loading">
       <div class="loading-content">
@@ -75,7 +86,7 @@
         <div class="loading-text">Loading Video Transcriber...</div>
       </div>
     </div>
-    
+
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
@@ -86,5 +97,9 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    <!-- Google APIs -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
   </body>
 </html>

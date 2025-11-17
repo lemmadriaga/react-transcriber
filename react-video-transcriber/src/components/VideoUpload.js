@@ -29,7 +29,7 @@ const VideoUpload = ({ onVideoSelect, onError }) => {
     signIn,
     signOut,
     isLoading,
-    pickVideo,
+    listVideos,
     accessSharedVideo,
   } = useGoogleDrive();
 
@@ -116,8 +116,25 @@ const VideoUpload = ({ onVideoSelect, onError }) => {
 
   const handleGoogleDriveSelect = async () => {
     try {
+      console.log('handleGoogleDriveSelect called');
       setIsProcessing(true);
-      const videoFile = await pickVideo();
+      
+      // Get list of videos from Google Drive
+      console.log('Calling listVideos...');
+      const videosData = await listVideos(20);
+      console.log('Videos data received:', videosData);
+      
+      if (!videosData.files || videosData.files.length === 0) {
+        throw new Error("No video files found in your Google Drive");
+      }
+      
+      // For now, let's take the first video (we can add a picker UI later)
+      const videoFile = videosData.files[0];
+      console.log('Selected video file:', videoFile);
+      
+      if (!videoFile) {
+        throw new Error("No video files available");
+      }
 
       const mockFile = {
         name: videoFile.name,
